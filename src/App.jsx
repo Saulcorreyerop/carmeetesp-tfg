@@ -43,13 +43,17 @@ function App() {
         <Header session={session} />
         <main className='main-content'>
           <Routes>
-            <Route path='/' element={<HomePage />} />
+            <Route path='/' element={<HomePage session={session} />} />
             <Route path='/eventos' element={<EventsPage session={session} />} />
+            <Route
+              path='/eventos/:slug'
+              element={<EventDetailPage session={session} />}
+            />
             <Route
               path='/eventos/:id'
               element={<EventDetailPage session={session} />}
             />
-            <Route path='/mapa' element={<MapPage />} />
+            <Route path='/mapa' element={<MapPage session={session} />} />
             <Route path='/login' element={<AuthPage session={session} />} />
             <Route
               path='/perfil'

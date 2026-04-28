@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import { MapPin, Upload, Search, X } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { generarSlugUnico } from '../utils/slug'
 
 // Fix icono leaflet
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
@@ -25,14 +26,36 @@ const SelectorUbicacion = ({ onSeleccionar }) => {
   return null
 }
 
-const CrearEventoForm = ({ session, onEventoCreado, onCancelar }) => {
+const CrearEventoForm = ({
+  session,
+  onEventoCreado,
+  onCancelar,
+  coordenadasIniciales,
+}) => {
   const [form, setForm] = useState({
     titulo: '',
     descripcion: '',
     lugar: '',
     fecha: '',
   })
-  const [coordenadas, setCoordenadas] = useState(null)
+  const [coordenadas, setCoordenadas] = useState(coordenadasIniciales || null)
+
+  useEffect(() => {
+    if (coordenadasIniciales) {
+      fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${coordenadasIniciales.lat}&lon=${coordenadasIniciales.lng}&format=json`,
+      )
+        .then((r) => r.json())
+        .then((data) => {
+          const nombre =
+            data.display_name ||
+            `${coordenadasIniciales.lat.toFixed(4)}, ${coordenadasIniciales.lng.toFixed(4)}`
+          setForm((f) => ({ ...f, lugar: nombre }))
+          setBusqueda(nombre)
+        })
+    }
+  }, [])
+
   const [imagenFile, setImagenFile] = useState(null)
   const [imagenPreview, setImagenPreview] = useState(null)
   const [busqueda, setBusqueda] = useState('')
@@ -119,6 +142,21 @@ const CrearEventoForm = ({ session, onEventoCreado, onCancelar }) => {
         .from('eventos')
         .getPublicUrl(nombreArchivo)
       imagen_url = urlData.publicUrl
+
+      // Generar slug único a partir del título
+      const slug = await generarSlugUnico(form.titulo, supabase)
+
+      const { error: errorEvento } = await supabase.from('eventos').insert({
+        titulo: form.titulo,
+        descripcion: form.descripcion,
+        lugar: form.lugar,
+        fecha: form.fecha,
+        latitud: coordenadas.lat,
+        longitud: coordenadas.lng,
+        imagen_url,
+        creador_id: session.user.id,
+        slug, // <-- añadido
+      })
     }
 
     // Crear el evento en la base de datos

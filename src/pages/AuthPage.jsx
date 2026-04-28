@@ -97,6 +97,7 @@ const AuthPage = ({ session }) => {
                   value={form.nombre}
                   onChange={handleChange}
                   required
+                  style={{ paddingLeft: '36px' }}
                 />
               </div>
             </div>
@@ -113,6 +114,7 @@ const AuthPage = ({ session }) => {
                 value={form.email}
                 onChange={handleChange}
                 required
+                style={{ paddingLeft: '36px' }}
               />
             </div>
           </div>
@@ -128,6 +130,7 @@ const AuthPage = ({ session }) => {
                 value={form.password}
                 onChange={handleChange}
                 required
+                style={{ paddingLeft: '36px' }}
               />
             </div>
           </div>

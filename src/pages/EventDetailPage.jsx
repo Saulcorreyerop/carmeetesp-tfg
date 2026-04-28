@@ -16,7 +16,7 @@ L.Marker.prototype.options.icon = L.icon({
 })
 
 const EventDetailPage = ({ session }) => {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
 
   const [evento, setEvento] = useState(null)
@@ -29,31 +29,49 @@ const EventDetailPage = ({ session }) => {
 
   useEffect(() => {
     cargarEvento()
-  }, [id])
+  }, [slug])
 
   const cargarEvento = async () => {
     setCargando(true)
 
-    // Cargar evento
-    const { data: eventoData } = await supabase
+    // Buscar por slug, si no existe buscar por id (eventos antiguos sin slug)
+    let eventoData = null
+    const { data: porSlug } = await supabase
       .from('eventos')
       .select('*')
-      .eq('id', id)
-      .single()
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (porSlug) {
+      eventoData = porSlug
+    } else {
+      const { data: porId } = await supabase
+        .from('eventos')
+        .select('*')
+        .eq('id', slug)
+        .maybeSingle()
+      eventoData = porId
+    }
+
     setEvento(eventoData)
 
-    // Cargar asistentes
+    if (!eventoData) {
+      setCargando(false)
+      return
+    }
+
+    // Cargar asistentes usando el ID real del evento
     const { data: asistentesData } = await supabase
       .from('inscripciones')
       .select('usuario_id, usuarios(nombre, foto_url)')
-      .eq('evento_id', id)
+      .eq('evento_id', eventoData.id)
     setAsistentes(asistentesData || [])
 
-    // Contar favoritos
+    // Contar favoritos usando el ID real del evento
     const { count } = await supabase
       .from('favoritos')
       .select('*', { count: 'exact', head: true })
-      .eq('evento_id', id)
+      .eq('evento_id', eventoData.id)
     setTotalFavoritos(count || 0)
 
     // Comprobar si el usuario actual ya asiste o tiene favorito
@@ -61,17 +79,17 @@ const EventDetailPage = ({ session }) => {
       const { data: inscripcion } = await supabase
         .from('inscripciones')
         .select('id')
-        .eq('evento_id', id)
+        .eq('evento_id', eventoData.id)
         .eq('usuario_id', session.user.id)
-        .single()
+        .maybeSingle()
       setYaAsiste(!!inscripcion)
 
       const { data: favorito } = await supabase
         .from('favoritos')
         .select('id')
-        .eq('evento_id', id)
+        .eq('evento_id', eventoData.id)
         .eq('usuario_id', session.user.id)
-        .single()
+        .maybeSingle()
       setYaFavorito(!!favorito)
     }
 
@@ -88,14 +106,14 @@ const EventDetailPage = ({ session }) => {
       await supabase
         .from('inscripciones')
         .delete()
-        .eq('evento_id', id)
+        .eq('evento_id', evento.id)
         .eq('usuario_id', session.user.id)
       setYaAsiste(false)
       setAsistentes((a) => a.filter((a) => a.usuario_id !== session.user.id))
     } else {
       await supabase
         .from('inscripciones')
-        .insert({ evento_id: id, usuario_id: session.user.id })
+        .insert({ evento_id: evento.id, usuario_id: session.user.id })
       setYaAsiste(true)
       setAsistentes((a) => [
         ...a,
@@ -115,14 +133,14 @@ const EventDetailPage = ({ session }) => {
       await supabase
         .from('favoritos')
         .delete()
-        .eq('evento_id', id)
+        .eq('evento_id', evento.id)
         .eq('usuario_id', session.user.id)
       setYaFavorito(false)
       setTotalFavoritos((f) => f - 1)
     } else {
       await supabase
         .from('favoritos')
-        .insert({ evento_id: id, usuario_id: session.user.id })
+        .insert({ evento_id: evento.id, usuario_id: session.user.id })
       setYaFavorito(true)
       setTotalFavoritos((f) => f + 1)
     }
@@ -131,7 +149,7 @@ const EventDetailPage = ({ session }) => {
 
   const handleEliminar = async () => {
     if (!confirm('¿Seguro que quieres eliminar este evento?')) return
-    await supabase.from('eventos').delete().eq('id', id)
+    await supabase.from('eventos').delete().eq('id', evento.id)
     navigate('/eventos')
   }
 
@@ -156,12 +174,10 @@ const EventDetailPage = ({ session }) => {
 
   return (
     <div className='page-container'>
-      {/* Botón volver */}
       <button className='btn-volver' onClick={() => navigate('/eventos')}>
         <ArrowLeft size={16} /> Volver a eventos
       </button>
 
-      {/* Imagen portada */}
       {evento.imagen_url && (
         <img
           src={evento.imagen_url}
@@ -170,7 +186,6 @@ const EventDetailPage = ({ session }) => {
         />
       )}
 
-      {/* Cabecera */}
       <div className='detalle-header'>
         <div className='detalle-info'>
           <h1 className='detalle-titulo'>{evento.titulo}</h1>
@@ -184,7 +199,6 @@ const EventDetailPage = ({ session }) => {
           </p>
         </div>
 
-        {/* Acciones */}
         <div className='detalle-acciones'>
           <button
             className={`btn-accion ${yaFavorito ? 'btn-accion-activo-rojo' : ''}`}
@@ -216,7 +230,6 @@ const EventDetailPage = ({ session }) => {
         </div>
       </div>
 
-      {/* Descripción */}
       {evento.descripcion && (
         <div className='detalle-seccion'>
           <h2>Descripción</h2>
@@ -224,7 +237,6 @@ const EventDetailPage = ({ session }) => {
         </div>
       )}
 
-      {/* Mapa */}
       <div className='detalle-seccion'>
         <h2>Ubicación</h2>
         <div className='detalle-mapa'>
@@ -241,7 +253,6 @@ const EventDetailPage = ({ session }) => {
         </div>
       </div>
 
-      {/* Asistentes */}
       <div className='detalle-seccion'>
         <h2>
           {asistentes.length}{' '}

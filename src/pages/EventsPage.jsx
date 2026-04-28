@@ -83,7 +83,7 @@ const EventsPage = ({ session }) => {
             <div
               key={evento.id}
               className='evento-card'
-              onClick={() => navigate(`/eventos/${evento.id}`)}
+              onClick={() => navigate(`/eventos/${evento.slug || evento.id}`)}
             >
               {evento.imagen_url && (
                 <img
