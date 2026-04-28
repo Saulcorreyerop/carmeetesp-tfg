@@ -126,7 +126,7 @@ const CrearEventoForm = ({
 
     let imagen_url = ''
 
-    // Subir imagen al bucket si se ha seleccionado
+    // Subir imagen si se ha seleccionado
     if (imagenFile) {
       const extension = imagenFile.name.split('.').pop()
       const nombreArchivo = `${session.user.id}/${Date.now()}.${extension}`
@@ -142,24 +142,12 @@ const CrearEventoForm = ({
         .from('eventos')
         .getPublicUrl(nombreArchivo)
       imagen_url = urlData.publicUrl
-
-      // Generar slug único a partir del título
-      const slug = await generarSlugUnico(form.titulo, supabase)
-
-      const { error: errorEvento } = await supabase.from('eventos').insert({
-        titulo: form.titulo,
-        descripcion: form.descripcion,
-        lugar: form.lugar,
-        fecha: form.fecha,
-        latitud: coordenadas.lat,
-        longitud: coordenadas.lng,
-        imagen_url,
-        creador_id: session.user.id,
-        slug, // <-- añadido
-      })
     }
 
-    // Crear el evento en la base de datos
+    // Generar slug único
+    const slug = await generarSlugUnico(form.titulo, supabase)
+
+    // Crear el evento — UN SOLO INSERT
     const { error: errorEvento } = await supabase.from('eventos').insert({
       titulo: form.titulo,
       descripcion: form.descripcion,
@@ -169,6 +157,7 @@ const CrearEventoForm = ({
       longitud: coordenadas.lng,
       imagen_url,
       creador_id: session.user.id,
+      slug,
     })
 
     if (errorEvento) {

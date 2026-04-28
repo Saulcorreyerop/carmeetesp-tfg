@@ -34,7 +34,6 @@ const EventDetailPage = ({ session }) => {
   const cargarEvento = async () => {
     setCargando(true)
 
-    // Buscar por slug, si no existe buscar por id (eventos antiguos sin slug)
     let eventoData = null
     const { data: porSlug } = await supabase
       .from('eventos')
@@ -60,21 +59,18 @@ const EventDetailPage = ({ session }) => {
       return
     }
 
-    // Cargar asistentes usando el ID real del evento
     const { data: asistentesData } = await supabase
       .from('inscripciones')
       .select('usuario_id, usuarios(nombre, foto_url)')
       .eq('evento_id', eventoData.id)
     setAsistentes(asistentesData || [])
 
-    // Contar favoritos usando el ID real del evento
     const { count } = await supabase
       .from('favoritos')
       .select('*', { count: 'exact', head: true })
       .eq('evento_id', eventoData.id)
     setTotalFavoritos(count || 0)
 
-    // Comprobar si el usuario actual ya asiste o tiene favorito
     if (session?.user?.id) {
       const { data: inscripcion } = await supabase
         .from('inscripciones')
@@ -237,6 +233,7 @@ const EventDetailPage = ({ session }) => {
         </div>
       )}
 
+      {/* Mapa + botones de navegación */}
       <div className='detalle-seccion'>
         <h2>Ubicación</h2>
         <div className='detalle-mapa'>
@@ -251,8 +248,63 @@ const EventDetailPage = ({ session }) => {
             </Marker>
           </MapContainer>
         </div>
+
+        <div className='navegacion-botones'>
+          <a
+            href={
+              'https://www.google.com/maps/dir/?api=1&destination=' +
+              evento.latitud +
+              ',' +
+              evento.longitud
+            }
+            target='_blank'
+            rel='noopener noreferrer'
+            className='nav-btn nav-btn-google'
+          >
+            <svg viewBox='0 0 24 24' width='18' height='18' fill='currentColor'>
+              <path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z' />
+            </svg>
+            Google Maps
+          </a>
+
+          <a
+            href={
+              'https://maps.apple.com/?daddr=' +
+              evento.latitud +
+              ',' +
+              evento.longitud
+            }
+            target='_blank'
+            rel='noopener noreferrer'
+            className='nav-btn nav-btn-apple'
+          >
+            <svg viewBox='0 0 24 24' width='18' height='18' fill='currentColor'>
+              <path d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z' />
+            </svg>
+            Apple Maps
+          </a>
+
+          <a
+            href={
+              'https://waze.com/ul?ll=' +
+              evento.latitud +
+              ',' +
+              evento.longitud +
+              '&navigate=yes'
+            }
+            target='_blank'
+            rel='noopener noreferrer'
+            className='nav-btn nav-btn-waze'
+          >
+            <svg viewBox='0 0 24 24' width='18' height='18' fill='currentColor'>
+              <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z' />
+            </svg>
+            Waze
+          </a>
+        </div>
       </div>
 
+      {/* Asistentes */}
       <div className='detalle-seccion'>
         <h2>
           {asistentes.length}{' '}
@@ -263,7 +315,12 @@ const EventDetailPage = ({ session }) => {
         ) : (
           <div className='asistentes-lista'>
             {asistentes.map((a, i) => (
-              <div key={i} className='asistente-chip'>
+              <div
+                key={i}
+                className='asistente-chip'
+                onClick={() => navigate(`/usuario/${a.usuario_id}`)}
+                title='Ver perfil'
+              >
                 {a.usuarios?.foto_url ? (
                   <img src={a.usuarios.foto_url} alt={a.usuarios.nombre} />
                 ) : (

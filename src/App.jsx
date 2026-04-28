@@ -11,6 +11,7 @@ import EventDetailPage from './pages/EventDetailPage'
 import MapPage from './pages/MapPage'
 import AuthPage from './pages/AuthPage'
 import ProfilePage from './pages/ProfilePage'
+import PublicProfilePage from './pages/publicProfilePage'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -65,6 +66,7 @@ function App() {
                 )
               }
             />
+            <Route path='/usuario/:userId' element={<PublicProfilePage />} />
           </Routes>
         </main>
         <Footer />

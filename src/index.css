@@ -1261,3 +1261,51 @@ img {
     font-size: 16px;
   }
 }
+
+.navegacion-botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radio);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--color-borde);
+  transition: all 0.2s;
+  color: var(--color-texto);
+  background-color: var(--color-bg-card);
+  min-width: 140px;
+}
+
+.nav-btn:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--sombra);
+}
+
+.nav-btn svg {
+  flex-shrink: 0;
+}
+
+.nav-btn-google:hover {
+  border-color: #4285f4;
+  color: #4285f4;
+}
+.nav-btn-apple:hover {
+  border-color: #555;
+  color: #555;
+}
+.nav-btn-waze:hover {
+  border-color: #05c8f7;
+  color: #05c8f7;
+}
