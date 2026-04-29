@@ -12,6 +12,8 @@ import MapPage from './pages/MapPage'
 import AuthPage from './pages/AuthPage'
 import ProfilePage from './pages/ProfilePage'
 import PublicProfilePage from './pages/publicProfilePage'
+import GaragePage from './pages/GaragePage'
+import GarageDetailPage from './pages/GarageDetailPage'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -67,6 +69,11 @@ function App() {
               }
             />
             <Route path='/usuario/:userId' element={<PublicProfilePage />} />
+            <Route path='/garaje' element={<GaragePage session={session} />} />
+            <Route
+              path='/garaje/:id'
+              element={<GarageDetailPage session={session} />}
+            />
           </Routes>
         </main>
         <Footer />

@@ -1309,3 +1309,233 @@ img {
   border-color: #05c8f7;
   color: #05c8f7;
 }
+
+/* ── Garaje ── */
+.garaje-buscador {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.garaje-buscador input {
+  width: 100%;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 10px 12px 10px 36px;
+  color: var(--color-texto);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: Arial, sans-serif;
+}
+
+.garaje-buscador input:focus {
+  border-color: var(--color-primary);
+}
+
+.garaje-buscador .form-icono {
+  position: absolute;
+  left: 12px;
+  color: var(--color-texto-suave);
+}
+
+.tipo-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.tipo-btn {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background-color: var(--color-bg);
+  color: var(--color-texto);
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.tipo-btn-activo {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.form-grupo select {
+  width: 100%;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 10px 12px;
+  color: var(--color-texto);
+  font-size: 15px;
+  outline: none;
+  font-family: Arial, sans-serif;
+  transition: border-color 0.2s;
+}
+
+.form-grupo select:focus {
+  border-color: var(--color-primary);
+}
+
+.vehiculo-sin-imagen {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+  color: var(--color-texto-suave);
+}
+
+.vehiculo-owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-borde);
+}
+
+.vehiculo-owner img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.vehiculo-owner span {
+  font-size: 13px;
+  color: var(--color-texto-suave);
+}
+
+.owner-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.owner-nombre {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-primary);
+}
+
+.owner-nombre:hover {
+  text-decoration: underline;
+}
+
+/* ── Comentarios ── */
+.comentarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comentario {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 12px 14px;
+}
+
+.comentario-avatar img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comentario-avatar .owner-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+.comentario-cuerpo {
+  flex: 1;
+}
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.comentario-nombre {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.comentario-fecha {
+  font-size: 12px;
+  color: var(--color-texto-suave);
+}
+
+.comentario-texto {
+  font-size: 14px;
+  color: var(--color-texto);
+  line-height: 1.6;
+}
+
+.comentario-eliminar {
+  background: none;
+  border: none;
+  color: var(--color-texto-suave);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.comentario-eliminar:hover {
+  color: #dc2626;
+}
+
+.comentario-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.comentario-form input {
+  flex: 1;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 10px 14px;
+  color: var(--color-texto);
+  font-size: 15px;
+  outline: none;
+  font-family: Arial, sans-serif;
+  transition: border-color 0.2s;
+}
+
+.comentario-form input:focus {
+  border-color: var(--color-primary);
+}
+
+.link-login {
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.link-login:hover {
+  text-decoration: underline;
+}

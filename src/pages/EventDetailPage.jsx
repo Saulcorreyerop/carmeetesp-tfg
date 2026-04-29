@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
-import { Calendar, MapPin, Heart, Users, ArrowLeft, Trash2 } from 'lucide-react'
+import {
+  Calendar,
+  MapPin,
+  Heart,
+  Users,
+  ArrowLeft,
+  Trash2,
+  Send,
+} from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -26,6 +34,9 @@ const EventDetailPage = ({ session }) => {
   const [yaAsiste, setYaAsiste] = useState(false)
   const [yaFavorito, setYaFavorito] = useState(false)
   const [cargandoAccion, setCargandoAccion] = useState(false)
+  const [comentarios, setComentarios] = useState([])
+  const [nuevoComentario, setNuevoComentario] = useState('')
+  const [enviando, setEnviando] = useState(false)
 
   useEffect(() => {
     cargarEvento()
@@ -89,6 +100,13 @@ const EventDetailPage = ({ session }) => {
       setYaFavorito(!!favorito)
     }
 
+    const { data: comentariosData } = await supabase
+      .from('comentarios')
+      .select('*, usuarios(nombre, foto_url)')
+      .eq('evento_id', eventoData.id)
+      .order('created_at', { ascending: true })
+    setComentarios(comentariosData || [])
+
     setCargando(false)
   }
 
@@ -147,6 +165,27 @@ const EventDetailPage = ({ session }) => {
     if (!confirm('¿Seguro que quieres eliminar este evento?')) return
     await supabase.from('eventos').delete().eq('id', evento.id)
     navigate('/eventos')
+  }
+
+  const handleComentario = async (e) => {
+    e.preventDefault()
+    if (!nuevoComentario.trim()) return
+    setEnviando(true)
+    const { error } = await supabase.from('comentarios').insert({
+      evento_id: evento.id,
+      usuario_id: session.user.id,
+      contenido: nuevoComentario.trim(),
+    })
+    if (!error) {
+      setNuevoComentario('')
+      cargarEvento()
+    }
+    setEnviando(false)
+  }
+
+  const handleEliminarComentario = async (comentarioId) => {
+    await supabase.from('comentarios').delete().eq('id', comentarioId)
+    setComentarios((c) => c.filter((c) => c.id !== comentarioId))
   }
 
   const formatearFecha = (fecha) => {
@@ -233,7 +272,6 @@ const EventDetailPage = ({ session }) => {
         </div>
       )}
 
-      {/* Mapa + botones de navegación */}
       <div className='detalle-seccion'>
         <h2>Ubicación</h2>
         <div className='detalle-mapa'>
@@ -304,7 +342,6 @@ const EventDetailPage = ({ session }) => {
         </div>
       </div>
 
-      {/* Asistentes */}
       <div className='detalle-seccion'>
         <h2>
           {asistentes.length}{' '}
@@ -332,6 +369,75 @@ const EventDetailPage = ({ session }) => {
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      <div className='detalle-seccion'>
+        <h2>Comentarios ({comentarios.length})</h2>
+        {comentarios.length === 0 ? (
+          <p className='texto-suave'>Sé el primero en comentar.</p>
+        ) : (
+          <div className='comentarios-lista'>
+            {comentarios.map((c) => (
+              <div key={c.id} className='comentario'>
+                <div className='comentario-avatar'>
+                  {c.usuarios?.foto_url ? (
+                    <img src={c.usuarios.foto_url} alt={c.usuarios.nombre} />
+                  ) : (
+                    <div className='owner-avatar'>
+                      {c.usuarios?.nombre?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                  )}
+                </div>
+                <div className='comentario-cuerpo'>
+                  <div className='comentario-header'>
+                    <span className='comentario-nombre'>
+                      {c.usuarios?.nombre}
+                    </span>
+                    <span className='comentario-fecha'>
+                      {new Date(c.created_at).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                  <p className='comentario-texto'>{c.contenido}</p>
+                </div>
+                {session?.user?.id === c.usuario_id && (
+                  <button
+                    className='comentario-eliminar'
+                    onClick={() => handleEliminarComentario(c.id)}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {session ? (
+          <form onSubmit={handleComentario} className='comentario-form'>
+            <input
+              type='text'
+              value={nuevoComentario}
+              onChange={(e) => setNuevoComentario(e.target.value)}
+              placeholder='Escribe un comentario...'
+              required
+            />
+            <button type='submit' className='btn-primary' disabled={enviando}>
+              <Send size={16} />
+              {enviando ? 'Enviando...' : 'Enviar'}
+            </button>
+          </form>
+        ) : (
+          <p className='texto-suave'>
+            <span className='link-login' onClick={() => navigate('/login')}>
+              Inicia sesión
+            </span>{' '}
+            para comentar.
+          </p>
         )}
       </div>
     </div>
