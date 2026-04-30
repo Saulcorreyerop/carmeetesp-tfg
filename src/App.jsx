@@ -15,6 +15,7 @@ import PublicProfilePage from './pages/publicProfilePage'
 import GaragePage from './pages/GaragePage'
 import GarageDetailPage from './pages/GarageDetailPage'
 
+/**Comentario prueba para subir el repositorio con los cambios*/
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
