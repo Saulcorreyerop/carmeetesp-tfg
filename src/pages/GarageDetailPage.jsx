@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { ArrowLeft, Trash2, Send } from 'lucide-react'
+import { useAdmin } from '../hooks/useAdmin'
 
 const GarageDetailPage = ({ session }) => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const esAdmin = useAdmin(session)
   const [vehiculo, setVehiculo] = useState(null)
   const [comentarios, setComentarios] = useState([])
   const [nuevoComentario, setNuevoComentario] = useState('')
@@ -167,7 +169,7 @@ const GarageDetailPage = ({ session }) => {
                   </div>
                   <p className='comentario-texto'>{c.contenido}</p>
                 </div>
-                {session?.user?.id === c.usuario_id && (
+                {(session?.user?.id === c.usuario_id || esAdmin) && (
                   <button
                     className='comentario-eliminar'
                     onClick={() => handleEliminarComentario(c.id)}

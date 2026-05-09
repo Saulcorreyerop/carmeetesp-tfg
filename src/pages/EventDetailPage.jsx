@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import EditarEventoForm from '../components/EditarEventoForm'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import {
@@ -9,12 +10,14 @@ import {
   ArrowLeft,
   Trash2,
   Send,
+  Edit2,
 } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
+import { useAdmin } from '../hooks/useAdmin'
 
 L.Marker.prototype.options.icon = L.icon({
   iconUrl,
@@ -26,6 +29,7 @@ L.Marker.prototype.options.icon = L.icon({
 const EventDetailPage = ({ session }) => {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const esAdmin = useAdmin(session)
 
   const [evento, setEvento] = useState(null)
   const [cargando, setCargando] = useState(true)
@@ -34,6 +38,7 @@ const EventDetailPage = ({ session }) => {
   const [yaAsiste, setYaAsiste] = useState(false)
   const [yaFavorito, setYaFavorito] = useState(false)
   const [cargandoAccion, setCargandoAccion] = useState(false)
+  const [editando, setEditando] = useState(false)
   const [comentarios, setComentarios] = useState([])
   const [nuevoComentario, setNuevoComentario] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -196,6 +201,7 @@ const EventDetailPage = ({ session }) => {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Europe/Madrid',
     })
   }
 
@@ -221,49 +227,73 @@ const EventDetailPage = ({ session }) => {
         />
       )}
 
-      <div className='detalle-header'>
-        <div className='detalle-info'>
-          <h1 className='detalle-titulo'>{evento.titulo}</h1>
-          <p className='evento-dato'>
-            <Calendar size={16} />
-            {formatearFecha(evento.fecha)}
-          </p>
-          <p className='evento-dato'>
-            <MapPin size={16} />
-            {evento.lugar}
-          </p>
+      {editando && (
+        <div className='editar-evento-wrap'>
+          <EditarEventoForm
+            evento={evento}
+            onEventoEditado={() => {
+              setEditando(false)
+              cargarEvento()
+            }}
+            onCancelar={() => setEditando(false)}
+          />
         </div>
+      )}
 
-        <div className='detalle-acciones'>
-          <button
-            className={`btn-accion ${yaFavorito ? 'btn-accion-activo-rojo' : ''}`}
-            onClick={toggleFavorito}
-            disabled={cargandoAccion}
-          >
-            <Heart size={18} fill={yaFavorito ? 'currentColor' : 'none'} />
-            {totalFavoritos} {totalFavoritos === 1 ? 'favorito' : 'favoritos'}
-          </button>
+      {!editando && (
+        <div className='detalle-header'>
+          <div className='detalle-info'>
+            <h1 className='detalle-titulo'>{evento.titulo}</h1>
+            <p className='evento-dato'>
+              <Calendar size={16} />
+              {formatearFecha(evento.fecha)}
+            </p>
+            <p className='evento-dato'>
+              <MapPin size={16} />
+              {evento.lugar}
+            </p>
+          </div>
 
-          <button
-            className={`btn-accion ${yaAsiste ? 'btn-accion-activo' : ''}`}
-            onClick={toggleAsistir}
-            disabled={cargandoAccion}
-          >
-            <Users size={18} />
-            {yaAsiste ? 'Cancelar asistencia' : 'Asistir'}
-          </button>
-
-          {session?.user?.id === evento.creador_id && (
+          <div className='detalle-acciones'>
             <button
-              className='btn-accion btn-accion-peligro'
-              onClick={handleEliminar}
+              className={`btn-accion ${yaFavorito ? 'btn-accion-activo-rojo' : ''}`}
+              onClick={toggleFavorito}
+              disabled={cargandoAccion}
             >
-              <Trash2 size={18} />
-              Eliminar
+              <Heart size={18} fill={yaFavorito ? 'currentColor' : 'none'} />
+              {totalFavoritos} {totalFavoritos === 1 ? 'favorito' : 'favoritos'}
             </button>
-          )}
+
+            <button
+              className={`btn-accion ${yaAsiste ? 'btn-accion-activo' : ''}`}
+              onClick={toggleAsistir}
+              disabled={cargandoAccion}
+            >
+              <Users size={18} />
+              {yaAsiste ? 'Cancelar asistencia' : 'Asistir'}
+            </button>
+
+            {session?.user?.id === evento.creador_id && (
+              <>
+                <button
+                  className='btn-accion'
+                  onClick={() => setEditando(!editando)}
+                >
+                  <Edit2 size={18} />
+                  {editando ? 'Cancelar' : 'Editar'}
+                </button>
+                <button
+                  className='btn-accion btn-accion-peligro'
+                  onClick={handleEliminar}
+                >
+                  <Trash2 size={18} />
+                  Eliminar
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {evento.descripcion && (
         <div className='detalle-seccion'>
@@ -404,7 +434,7 @@ const EventDetailPage = ({ session }) => {
                   </div>
                   <p className='comentario-texto'>{c.contenido}</p>
                 </div>
-                {session?.user?.id === c.usuario_id && (
+                {(session?.user?.id === c.usuario_id || esAdmin) && (
                   <button
                     className='comentario-eliminar'
                     onClick={() => handleEliminarComentario(c.id)}

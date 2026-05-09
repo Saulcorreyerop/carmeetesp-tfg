@@ -2,10 +2,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { LogOut, User, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { useAdmin } from '../hooks/useAdmin'
 
 const Header = ({ session }) => {
   const navigate = useNavigate()
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const esAdmin = useAdmin(session)
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -26,6 +28,11 @@ const Header = ({ session }) => {
           <Link to='/eventos'>Eventos</Link>
           <Link to='/mapa'>Mapa</Link>
           <Link to='/garaje'>Garaje</Link>
+          {esAdmin && (
+            <Link to='/admin' style={{ color: '#f97316', fontWeight: '500' }}>
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Acciones usuario */}

@@ -14,20 +14,18 @@ import ProfilePage from './pages/ProfilePage'
 import PublicProfilePage from './pages/publicProfilePage'
 import GaragePage from './pages/GaragePage'
 import GarageDetailPage from './pages/GarageDetailPage'
+import AdminPage from './pages/AdminPage'
 
-/**Comentario prueba para subir el repositorio con los cambios*/
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Comprobamos si hay sesión activa al cargar la app
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
 
-    // Escuchamos cambios de sesión (login / logout)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -53,10 +51,6 @@ function App() {
               path='/eventos/:slug'
               element={<EventDetailPage session={session} />}
             />
-            <Route
-              path='/eventos/:id'
-              element={<EventDetailPage session={session} />}
-            />
             <Route path='/mapa' element={<MapPage session={session} />} />
             <Route path='/login' element={<AuthPage session={session} />} />
             <Route
@@ -74,6 +68,16 @@ function App() {
             <Route
               path='/garaje/:id'
               element={<GarageDetailPage session={session} />}
+            />
+            <Route
+              path='/admin'
+              element={
+                session ? (
+                  <AdminPage session={session} />
+                ) : (
+                  <Navigate to='/login' />
+                )
+              }
             />
           </Routes>
         </main>

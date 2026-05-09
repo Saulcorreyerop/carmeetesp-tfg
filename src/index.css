@@ -1539,3 +1539,239 @@ img {
 .link-login:hover {
   text-decoration: underline;
 }
+
+/* ── Secciones de eventos ── */
+.eventos-seccion {
+  margin-bottom: 48px;
+}
+
+.eventos-seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-borde);
+}
+
+.eventos-seccion-titulo {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--color-texto);
+  margin: 0;
+}
+
+.seccion-icono-trophy {
+  color: #f59e0b;
+}
+.seccion-icono-calendar {
+  color: var(--color-primary);
+}
+.seccion-icono-clock {
+  color: var(--color-texto-suave);
+}
+
+/* Top eventos */
+.top-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.top-evento-wrap {
+  position: relative;
+}
+
+.top-badge {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  background: #f59e0b;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.top-evento-wrap:first-child .top-badge {
+  background: #f59e0b;
+  width: 36px;
+  height: 36px;
+  font-size: 15px;
+}
+
+/* Eventos pasados */
+.evento-card-pasado {
+  opacity: 0.5;
+  filter: grayscale(60%);
+  transition:
+    opacity 0.2s,
+    filter 0.2s;
+}
+
+.evento-card-pasado:hover {
+  opacity: 0.75;
+  filter: grayscale(30%);
+}
+.editar-evento-wrap {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.editar-evento-wrap .evento-form {
+  max-width: 100%;
+}
+/* ── Admin ── */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-stat-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-stat-num {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-texto);
+  margin: 0;
+}
+
+.admin-stat-label {
+  font-size: 13px;
+  color: var(--color-texto-suave);
+  margin: 0;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--color-borde);
+  padding-bottom: 0;
+}
+
+.admin-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-texto-suave);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-tab:hover {
+  color: var(--color-texto);
+}
+
+.admin-tab-activo {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.admin-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 14px;
+  transition: border-color 0.2s;
+}
+
+.admin-item:hover {
+  border-color: var(--color-primary);
+}
+
+.admin-item-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.admin-item-noimg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  color: var(--color-texto-suave);
+}
+
+.admin-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-item-titulo {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-texto);
+  margin: 0;
+}
+
+.admin-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-texto-suave);
+  margin: 0;
+}
+
+.admin-item-autor {
+  font-size: 12px;
+  color: var(--color-texto-suave);
+  margin: 0;
+  font-style: italic;
+}
+
+.admin-item-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .admin-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-item-acciones {
+    flex-direction: row;
+    width: 100%;
+  }
+}

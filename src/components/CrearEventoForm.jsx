@@ -111,6 +111,11 @@ const CrearEventoForm = ({
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
+    if (new Date(form.fecha) < new Date()) {
+      setError('No puedes crear un evento en una fecha pasada.')
+      setCargando(false)
+      return
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -148,11 +153,13 @@ const CrearEventoForm = ({
     const slug = await generarSlugUnico(form.titulo, supabase)
 
     // Crear el evento — UN SOLO INSERT
+    // Convertir la fecha local a UTC correctamente
+    const fechaConZona = new Date(form.fecha).toISOString()
     const { error: errorEvento } = await supabase.from('eventos').insert({
       titulo: form.titulo,
       descripcion: form.descripcion,
       lugar: form.lugar,
-      fecha: form.fecha,
+      fecha: fechaConZona,
       latitud: coordenadas.lat,
       longitud: coordenadas.lng,
       imagen_url,
@@ -202,6 +209,7 @@ const CrearEventoForm = ({
             name='fecha'
             value={form.fecha}
             onChange={handleChange}
+            min={new Date().toISOString().slice(0, 16)}
             required
           />
         </div>
