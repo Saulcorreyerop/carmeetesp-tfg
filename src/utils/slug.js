@@ -27,3 +27,4 @@ export const generarSlugUnico = async (titulo, supabase) => {
     contador++
   }
 }
+
